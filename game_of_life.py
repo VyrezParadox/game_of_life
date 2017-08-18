@@ -1,8 +1,10 @@
+import time
+
 def get_state(width, height):
     board = [[0 for i in range(0, width)] for i in range(0, height)]
 
     for i in range(0, height):
-        board[i] = list(input("Enter state of row {0}: ".format(i+1)))
+        board[i] = list(map(int, list(input("Enter state of row {0}: ".format(i+1)))))
 
     return board
 
@@ -23,19 +25,30 @@ def get_num_neighbours(board, row, col):
             i += 1
 
     for cell in cells:
-        num += int(board[cell[0]][cell[1]])
+        num += board[cell[0]][cell[1]]
 
     return num
 
-def get_neighbour_table(board):
-    rows = len(board)
-    cols = len(board[0])
+def get_next_gen(board):
+    WIDTH = len(board)
+    HEIGHT = len(board[0]) 
 
-    neighbours = [[0 for i in range(0, cols)] for i in range(0, rows)]
+    next_gen = [[0 for i in range(0, WIDTH)] for i in range(0, HEIGHT)]
+    neighbour_board = get_neighbour_board(board)
+    
+    for row in range(0, WIDTH):
+        for col in range(0, HEIGHT):
+            state = board[row][col]
+            neighbours = neighbour_board[row][col]
 
-    for row in range(0, rows):
-        for col in range(0, cols):
-            neighbours[row][col] = get_num_neighbours(board, row, col)
-
-    return neighbours
+            if state == 0 and neighbours == 3:
+                next_gen[row][col] = 1
+            elif state == 1 and (neighbours > 3 or neighbours < 2):
+                next_gen[row][col] = 0
+            elif state == 1:
+                next_gen[row][col] = 1
             
+    return next_gen
+
+def get_neighbour_board(board):
+    return [[get_num_neighbours(board, row, col) for col in range(0, len(board[0]))] for row in range(0, len(board))]
